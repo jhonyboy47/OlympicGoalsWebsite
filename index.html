@@ -3,53 +3,61 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>FC25 Tournament Registration</title>
+  <title>FC25 Tournament</title>
   <style>
-    body { font-family: sans-serif; max-width: 600px; margin: 2em auto; padding: 0 1em; }
-    label, input, select { display: block; width: 100%; margin-bottom: .75em; }
-    input, select { padding: .5em; }
-    .btn { background: #0070ba; color: white; padding: .75em; border: none; cursor: pointer; }
-    .btn:disabled { opacity: .6; cursor: default; }
+    body { max-width:480px; margin:2em auto; font-family:sans-serif }
+    label, input, select, button { display:block; width:100%; margin:0.75em 0 }
+    button { padding:0.75em; background:#0070BA; color:#fff; border:none; cursor:pointer }
   </style>
+  <!-- 1) Supabase client lib -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
 
-  <h1>FC 25 Tournament Registration</h1>
-  <form id="regForm" action="https://getform.io/f/YOUR-GETFORM-ENDPOINT" method="POST">
-    <label for="ea">EA ID</label>
-    <input type="text" id="ea" name="EA_ID" required/>
-
-    <label for="dc">Discord ID</label>
-    <input type="text" id="dc" name="Discord_ID" required/>
-
-    <label for="nat">Nation</label>
-    <select id="nat" name="Nation" required>
-      <option value="">– select nation –</option>
-      <option value="USA">USA</option>
-      <option value="Canada">Canada</option>
-      <!-- add more -->
-    </select>
-
-    <button type="submit" class="btn">Save Info → Go to Payment ↓</button>
+  <h1>Register & Pay</h1>
+  <form id="regForm">
+    <label>EA ID<input type="text" name="ea_id" required></label>
+    <label>Discord ID<input type="text" name="discord_id" required></label>
+    <label>Nation
+      <select name="nation" required>
+        <option value="">– choose –</option>
+        <option>USA</option>
+        <option>Canada</option>
+        <!-- …etc… -->
+      </select>
+    </label>
+    <button type="submit">Continue to Payment</button>
   </form>
 
-  <hr/>
-
-  <!-- PAYPAL SMART BUTTON -->
-  <div id="paypal-button-container"></div>
-  <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=USD"></script>
   <script>
-    paypal.Buttons({
-      style: { layout: 'vertical', color:  'blue', shape:  'rect', label:  'pay' },
-      createOrder: (data, actions) => {
-        return actions.order.create({
-          purchase_units: [{ amount: { value: '10.00' } }]
-        });
-      },
-      onApprove: (data, actions) => actions.order.capture()
-        .then(details => alert('Thanks, ' + details.payer.name.given_name + '!'))
-    }).render('#paypal-button-container');
-  </script>
+    //––– configure Supabase –––
+    const SUPABASE_URL = "https://cjbvzyqinzkncfykyjpv.supabase.co"      // ← your API URL
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqYnZ6eXFpbnprbmNmeWt5anB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEwMTIyNzgsImV4cCI6MjA2NjU4ODI3OH0.pWBmY4dZbmWU2_mjTbFcDsAQxdw0fSptSci9c-mnshY"                     // ← your anon key
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
+    document.getElementById("regForm").onsubmit = async e => {
+      e.preventDefault()
+      const fd = new FormData(e.target)
+      const payload = {
+        ea_id:       fd.get("ea_id"),
+        discord_id:  fd.get("discord_id"),
+        nation:      fd.get("nation")
+      }
+
+      // insert into Supabase
+      const { error } = await supabase
+        .from("registrations")
+        .insert([payload])
+
+      if (error) {
+        return alert("Something went wrong: " + error.message)
+      }
+
+      // on success, redirect to PayPal payment
+      window.location.href = 
+        "https://www.paypal.com/paypalme/YOUR_PAYPAL_ID/10" 
+      // ← swap for your own PayPal Me link or Payment Link
+    }
+  </script>
 </body>
 </html>
