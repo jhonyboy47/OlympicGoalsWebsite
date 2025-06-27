@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>FC25 Tournament Registration</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 2em auto; padding: 0 1em; }
+    label, input, select { display: block; width: 100%; margin-bottom: .75em; }
+    input, select { padding: .5em; }
+    .btn { background: #0070ba; color: white; padding: .75em; border: none; cursor: pointer; }
+    .btn:disabled { opacity: .6; cursor: default; }
+  </style>
+</head>
+<body>
+
+  <h1>FC 25 Tournament Registration</h1>
+  <form id="regForm" action="https://getform.io/f/YOUR-GETFORM-ENDPOINT" method="POST">
+    <label for="ea">EA ID</label>
+    <input type="text" id="ea" name="EA_ID" required/>
+
+    <label for="dc">Discord ID</label>
+    <input type="text" id="dc" name="Discord_ID" required/>
+
+    <label for="nat">Nation</label>
+    <select id="nat" name="Nation" required>
+      <option value="">– select nation –</option>
+      <option value="USA">USA</option>
+      <option value="Canada">Canada</option>
+      <!-- add more -->
+    </select>
+
+    <button type="submit" class="btn">Save Info → Go to Payment ↓</button>
+  </form>
+
+  <hr/>
+
+  <!-- PAYPAL SMART BUTTON -->
+  <div id="paypal-button-container"></div>
+  <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=USD"></script>
+  <script>
+    paypal.Buttons({
+      style: { layout: 'vertical', color:  'blue', shape:  'rect', label:  'pay' },
+      createOrder: (data, actions) => {
+        return actions.order.create({
+          purchase_units: [{ amount: { value: '10.00' } }]
+        });
+      },
+      onApprove: (data, actions) => actions.order.capture()
+        .then(details => alert('Thanks, ' + details.payer.name.given_name + '!'))
+    }).render('#paypal-button-container');
+  </script>
+
+</body>
+</html>
