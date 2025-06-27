@@ -23,7 +23,6 @@
         <option value="">– choose –</option>
         <option>USA</option>
         <option>Canada</option>
-        <!-- …etc… -->
       </select>
     </label>
     <button type="submit">Continue to Payment</button>
@@ -31,33 +30,33 @@
 
   <script>
     //––– configure Supabase –––
-    const SUPABASE_URL = "https://cjbvzyqinzkncfykyjpv.supabase.co"      // ← your API URL
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqYnZ6eXFpbnprbmNmeWt5anB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEwMTIyNzgsImV4cCI6MjA2NjU4ODI3OH0.pWBmY4dZbmWU2_mjTbFcDsAQxdw0fSptSci9c-mnshY"                     // ← your anon key
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+    const SUPABASE_URL = "https://cjbvzyqinzkncfykyjpv.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqYnZ6eXFpbnprbmNmeWt5anB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEwMTIyNzgsImV4cCI6MjA2NjU4ODI3OH0.pWBmY4dZbmWU2_mjTbFcDsAQxdw0fSptSci9c-mnshY";
+    
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     document.getElementById("regForm").onsubmit = async e => {
-      e.preventDefault()
-      const fd = new FormData(e.target)
+      e.preventDefault();
+      const fd = new FormData(e.target);
       const payload = {
         ea_id:       fd.get("ea_id"),
         discord_id:  fd.get("discord_id"),
         nation:      fd.get("nation")
-      }
+      };
 
       // insert into Supabase
-      const { error } = await supabase
+      const { error } = await client
         .from("registrations")
-        .insert([payload])
+        .insert([payload]);
 
       if (error) {
-        return alert("Something went wrong: " + error.message)
+        return alert("Something went wrong: " + error.message);
       }
 
       // on success, redirect to PayPal payment
       window.location.href = 
-        "https://www.paypal.com/paypalme/YOUR_PAYPAL_ID/10" 
-      // ← swap for your own PayPal Me link or Payment Link
-    }
+        "https://www.paypal.com/paypalme/YOUR_PAYPAL_ID/10";
+    };
   </script>
 </body>
 </html>
